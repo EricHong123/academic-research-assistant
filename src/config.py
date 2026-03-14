@@ -18,10 +18,17 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
-    # LLM
-    llm_provider: str = "anthropic"
+    # LLM - OpenAI
     openai_api_key: str = ""
+    openai_base_url: str = ""
+
+    # LLM - Anthropic
     anthropic_api_key: str = ""
+
+    # LLM - MiniMax
+    minimax_api_key: str = ""
+    minimax_base_url: str = "https://api.minimax.chat/v1"
+    minimax_group_id: str = ""
 
     # Vector Database
     pinecone_api_key: str = ""
@@ -47,6 +54,16 @@ class Settings(BaseSettings):
     # Celery
     celery_broker_url: str = "redis://localhost:6379/1"
     celery_result_backend: str = "redis://localhost:6379/2"
+
+    def get_llm_provider(self) -> str:
+        """Detect which LLM provider to use."""
+        if self.minimax_api_key:
+            return "minimax"
+        elif self.anthropic_api_key:
+            return "anthropic"
+        elif self.openai_api_key:
+            return "openai"
+        return "openai"  # default
 
     class Config:
         env_file = ".env"
