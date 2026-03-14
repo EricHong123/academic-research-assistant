@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Folder, FileText, Trash2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface Project {
   id: string;
@@ -12,6 +13,7 @@ interface Project {
 }
 
 export default function ProjectsPage() {
+  const { t } = useI18n();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -53,7 +55,7 @@ export default function ProjectsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this project?')) return;
+    if (!confirm(t('common.confirm') + '?')) return;
     try {
       await fetch(`/api/projects/${id}`, { method: 'DELETE' });
       setProjects((prev) => prev.filter((p) => p.id !== id));
@@ -65,13 +67,13 @@ export default function ProjectsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold">Projects</h2>
+        <h2 className="text-2xl font-bold">{t('projects.title')}</h2>
         <button
           onClick={() => setShowCreate(true)}
           className="btn btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          New Project
+          {t('projects.new')}
         </button>
       </div>
 
@@ -79,10 +81,10 @@ export default function ProjectsPage() {
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Create New Project</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('projects.create')}</h3>
             <form onSubmit={handleCreate}>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Name</label>
+                <label className="block text-sm font-medium mb-1">{t('projects.name')}</label>
                 <input
                   type="text"
                   value={newProject.name}
@@ -92,7 +94,7 @@ export default function ProjectsPage() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1">{t('projects.description')}</label>
                 <textarea
                   value={newProject.description}
                   onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
@@ -106,10 +108,10 @@ export default function ProjectsPage() {
                   onClick={() => setShowCreate(false)}
                   className="btn btn-secondary"
                 >
-                  Cancel
+                  {t('projects.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Create
+                  {t('projects.createBtn')}
                 </button>
               </div>
             </form>
@@ -119,11 +121,11 @@ export default function ProjectsPage() {
 
       {/* Projects Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t('common.loading')}</div>
       ) : projects.length === 0 ? (
         <div className="text-center py-12">
           <Folder className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No projects yet. Create one to get started!</p>
+          <p className="text-gray-500">{t('projects.empty')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -147,7 +149,7 @@ export default function ProjectsPage() {
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <FileText className="w-4 h-4" />
-                  {project.paper_count} papers
+                  {project.paper_count} {t('projects.papers')}
                 </span>
                 <span>{new Date(project.created_at).toLocaleDateString()}</span>
               </div>

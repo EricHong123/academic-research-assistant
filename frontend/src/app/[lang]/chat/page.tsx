@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, BookOpen, User, Bot } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,10 +16,11 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I can help you analyze papers in your project. Ask me questions about research methods, findings, or compare studies.',
+      content: t('chat.welcome'),
     },
   ]);
   const [input, setInput] = useState('');
@@ -72,7 +74,7 @@ export default function ChatPage() {
       <div className="card h-full flex flex-col">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <Bot className="w-5 h-5" />
-          Research Assistant Chat
+          {t('chat.title')}
         </h2>
 
         {/* Messages */}
@@ -101,7 +103,7 @@ export default function ChatPage() {
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                 {msg.citations && msg.citations.length > 0 && (
                   <div className="mt-3 pt-3 border-t text-xs text-gray-500">
-                    <p className="font-medium mb-1">Sources:</p>
+                    <p className="font-medium mb-1">{t('chat.sources')}:</p>
                     {msg.citations.map((cite, i) => (
                       <div key={i} className="flex items-start gap-2 mb-1">
                         <BookOpen className="w-3 h-3 mt-0.5 flex-shrink-0" />
@@ -139,7 +141,7 @@ export default function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="Ask about your papers..."
+            placeholder={t('chat.placeholder')}
             className="input flex-1"
             disabled={loading}
           />
