@@ -1,85 +1,60 @@
 # Academic Research Assistant (ARA)
 
-LangGraph-based AI Agent for academic literature search and analysis.
+LangGraph-based AI Agent for Academic Literature Search and Analysis
+
+[中文](./docs/README.md) | English
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)
+![LangGraph](https://img.shields.io/badge/LangGraph-0.2+-purple)
+![License](https://img.shields.io/badge/License-MIT-orange)
 
 ## Features
 
-- **Multi-database Search**: Search across Web of Science, Scopus, PubMed, Google Scholar
-- **Boolean Query Support**: Support for AND, OR, NOT operators and phrase search
-- **AI-Powered Ranking**: Relevance scoring using semantic embeddings
-- **PDF Parsing**: Extract structured data from academic papers
-- **RAG Chat**: Conversational interface with your paper collection
-- **Trend Briefings**: Automated research trend reports
+- **Multi-database Search** - Web of Science, Scopus, PubMed, Google Scholar
+- **Boolean Query Support** - AND, OR, NOT operators and phrase search
+- **AI Relevance Ranking** - Semantic embeddings, journal quality, study design
+- **PDF Parsing** - Extract research type, variables, sample size, statistics
+- **RAG Chat** - Conversational interface with citations
+- **Trend Briefings** - Automated research trend reports
+- **Project Management** - Organize literature collections
+- **Export Formats** - BibTeX, RIS, CSV
 
 ## Quick Start
 
-### 1. Install Dependencies
-
 ```bash
+# Clone
+git clone https://github.com/EricHong123/academic-research-assistant.git
 cd academic-research-assistant
+
+# Install
 pip install -e ".[dev]"
-```
 
-### 2. Configure Environment
-
-```bash
+# Configure
 cp .env.example .env
 # Edit .env with your API keys
+
+# Run
+python3 main.py
 ```
 
-### 3. Run the Server
+## API Documentation
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## Testing
 
 ```bash
-python main.py
+python3 -m pytest tests/ -v
 ```
 
-The API will be available at `http://localhost:8000`
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/search` | Search academic papers |
-| POST | `/api/chat` | RAG conversation |
-| GET | `/api/projects` | List projects |
-| POST | `/api/projects` | Create project |
-| POST | `/api/export/bibtex` | Export to BibTeX |
-| POST | `/api/export/ris` | Export to RIS |
-
-## Architecture
-
-```
-src/
-├── agents/          # LangGraph agents
-│   ├── main_graph.py
-│   ├── search_agent.py
-│   ├── parser_agent.py
-│   └── rag_agent.py
-├── api/            # FastAPI routes
-│   └── routes/
-├── models/         # Pydantic models
-├── services/       # Business logic
-│   ├── llm.py
-│   ├── vector_store.py
-│   └── adapters/   # Database adapters
-└── db/             # SQLAlchemy models
-```
-
-## Development
-
-### Run Tests
+## Docker
 
 ```bash
-pytest tests/
-```
-
-### Code Quality
-
-```bash
-ruff check src/
-mypy src/
+docker-compose up -d
 ```
 
 ## License
 
-MIT
+MIT License
