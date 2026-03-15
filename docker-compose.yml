@@ -14,6 +14,7 @@ services:
     depends_on:
       - db
       - redis
+      - weaviate
     volumes:
       - ./uploads:/app/uploads
       - ./storage:/app/storage
@@ -43,11 +44,44 @@ services:
     ports:
       - "5432:5432"
 
-  # Redis
+  # Redis (Cache & Celery Broker)
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # Weaviate Vector Database (Free, Open Source)
+  # Replace Pinecone with self-hosted Weaviate
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - ENABLE_MODULES=
+      - CLUSTER_HOSTNAME=node1
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  # MinerU PDF Parser (Best for Academic PDFs)
+  # Handles double-column layouts correctly
+  mineru:
+    image: ghcr.io/opendatalab/mineru:latest
+    ports:
+      - "8001:8001"
+    environment:
+      - MINERU_WORKERS=2
+    volumes:
+      - mineru_cache:/root/.cache
+    deploy:
+      resources:
+        limits:
+          memory: 8G
 
   # Frontend
   frontend:
@@ -61,3 +95,6 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
+  weaviate_data:
+  mineru_cache:

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     # App
     app_name: str = "Academic Research Assistant"
-    app_version: str = "0.1.0"
+    app_version: str = "0.2.0"
     debug: bool = True
 
     # Database
@@ -18,29 +18,53 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
-    # LLM - OpenAI
+    # LLM Providers
+    # OpenAI
     openai_api_key: str = ""
     openai_base_url: str = ""
 
-    # LLM - Anthropic
+    # Anthropic
     anthropic_api_key: str = ""
 
-    # LLM - MiniMax
+    # MiniMax (recommended for China)
     minimax_api_key: str = ""
     minimax_base_url: str = "https://api.minimax.chat/v1"
     minimax_group_id: str = ""
 
+    # SiliconFlow API (Free embedding + reranking)
+    siliconflow_api_key: str = ""
+    siliconflow_base_url: str = "https://api.siliconflow.cn/v1"
+
+    # Embedding Model (via SiliconFlow)
+    # BAAI/bge-m3 - Best for bilingual academic text (free)
+    embedding_model: str = "BAAI/bge-m3"
+    embedding_dimension: int = 1024
+
+    # Reranking Model (via SiliconFlow)
+    # BAAI/bge-reranker-v2-m3 - Best for academic reranking (free)
+    rerank_model: str = "BAAI/bge-reranker-v2-m3"
+
     # Vector Database
+    # Default to Weaviate (Docker-based, free)
+    vector_db_provider: str = "weaviate"  # "weaviate" or "pinecone"
     pinecone_api_key: str = ""
     pinecone_environment: str = "us-west1"
     weaviate_url: str = "http://localhost:8080"
+    weaviate_api_key: str = ""  # Optional for local dev
 
-    # Academic APIs
+    # Academic Database APIs
+    # Note: WOS/Scopus require institutional subscriptions
+    # Consider using institutional login (OAuth) in future
     wos_api_key: str = ""
     scopus_api_key: str = ""
     pubmed_api_key: str = ""
     ebsco_api_key: str = ""
     google_scholar_enabled: bool = False
+
+    # PDF Parsing
+    # MinerU: Best for academic PDFs with double-column layout
+    pdf_parser: str = "mineru"  # "mineru" or "pymupdf" (fallback)
+    mineru_host: str = "http://localhost:8001"  # MinerU service URL
 
     # JWT
     jwt_secret_key: str = "your-secret-key-change-in-production"
