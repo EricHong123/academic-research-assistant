@@ -7,20 +7,21 @@ import {
   Search,
   FolderOpen,
   MessageSquare,
-  Settings,
   Bell,
   User,
-  ChevronDown,
   Menu,
   X,
   BookMarked,
-  History,
-  Award
+  ChevronDown,
+  LogOut,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
 
 export function Header() {
   const { t, locale, setLocale } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const navItems = [
     { href: `/${locale}`, icon: Search, label: t('nav.search'), active: true },
@@ -29,18 +30,20 @@ export function Header() {
   ];
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-              <BookMarked className="w-5 h-5 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-slate-800">ARA</h1>
-              <p className="text-xs text-slate-500 -mt-0.5">Academic Research Assistant</p>
-            </div>
+            <Link href={`/${locale}`} className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                <BookMarked className="w-5 h-5 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-bold text-slate-800 tracking-tight">ARA</h1>
+                <p className="text-xs text-slate-500 -mt-0.5">Academic Research</p>
+              </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -49,7 +52,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   item.active
                     ? 'bg-blue-50 text-blue-700'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -75,13 +78,47 @@ export function Header() {
               {locale === 'en' ? '中文' : 'EN'}
             </button>
 
-            {/* User menu */}
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+            {/* Notifications */}
+            <button className="relative p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition-colors">
               <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
-              <User className="w-5 h-5" />
-            </button>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <ChevronDown className="w-4 h-4 hidden sm:block" />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-1 animate-scale-in">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <p className="text-sm font-medium text-slate-900">Guest User</p>
+                    <p className="text-xs text-slate-500">guest@example.com</p>
+                  </div>
+                  <Link href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Link>
+                  <Link href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                    <HelpCircle className="w-4 h-4" />
+                    Help
+                  </Link>
+                  <div className="border-t border-slate-100 mt-1 pt-1">
+                    <button className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full">
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Mobile menu button */}
             <button
@@ -103,7 +140,11 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium ${
+                  item.active
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
