@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, BookOpen, User, Bot } from 'lucide-react';
+import { Send, BookOpen, User, Bot, Copy, RefreshCw, Trash2, Info } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface Message {
@@ -16,7 +16,7 @@ interface Message {
 }
 
 export default function ChatPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -54,7 +54,7 @@ export default function ChatPage() {
       const data = await response.json();
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.data?.message?.content || 'No response',
+        content: data.data?.message?.content || locale === 'zh' ? '抱歉，我遇到了一些问题。' : 'Sorry, I encountered an error.',
         citations: data.data?.message?.citations,
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -62,96 +62,178 @@ export default function ChatPage() {
       console.error('Chat error:', error);
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Sorry, I encountered an error.' },
+        { role: 'assistant', content: locale === 'zh' ? '抱歉，我遇到了一些问题。' : 'Sorry, I encountered an error.' },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8 h-[calc(100vh-120px)]">
-      <div className="card h-full flex flex-col">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Bot className="w-5 h-5" />
-          {t('chat.title')}
-        </h2>
+  const clearChat = () => {
+    if (confirm(locale === 'zh' ? '确定清空对话？' : 'Clear all messages?')) {
+      setMessages([
+        {
+          role: 'assistant',
+          content: t('chat.welcome'),
+        },
+      ]);
+    }
+  };
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+  return (
+    <div className="h-[calc(100vh-4rem)] bg-slate-50">
+      <div className="max-w-4xl mx-auto h-full flex flex-col">
+        {/* 标题栏 */}
+        <div className="bg-white border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">{t('chat.title')}</h2>
+                <p className="text-sm text-slate-500">
+                  {locale === 'zh' ? '基于已有文献的智能问答' : 'AI-powered Q&A based on your literature'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={clearChat}
+              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title={locale === 'zh' ? '清空对话' : 'Clear chat'}
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* 消息区域 */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+              className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
+              {/* 头像 */}
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  msg.role === 'user' ? 'bg-blue-100' : 'bg-green-100'
+                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  msg.role === 'user'
+                    ? 'bg-blue-600'
+                    : 'bg-gradient-to-br from-green-500 to-emerald-600'
                 }`}
               >
                 {msg.role === 'user' ? (
-                  <User className="w-4 h-4 text-blue-600" />
+                  <User className="w-5 h-5 text-white" />
                 ) : (
-                  <Bot className="w-4 h-4 text-green-600" />
+                  <Bot className="w-5 h-5 text-white" />
                 )}
               </div>
+
+              {/* 消息内容 */}
               <div
-                className={`flex-1 p-4 rounded-lg ${
-                  msg.role === 'user' ? 'bg-blue-50' : 'bg-gray-50'
+                className={`flex-1 max-w-[80%] ${
+                  msg.role === 'user' ? 'text-right' : ''
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                <div
+                  className={`inline-block px-5 py-4 rounded-2xl ${
+                    msg.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white border border-slate-200 text-slate-800'
+                  }`}
+                >
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {msg.content}
+                  </div>
+                </div>
+
+                {/* 引用来源 */}
                 {msg.citations && msg.citations.length > 0 && (
-                  <div className="mt-3 pt-3 border-t text-xs text-gray-500">
-                    <p className="font-medium mb-1">{t('chat.sources')}:</p>
-                    {msg.citations.map((cite, i) => (
-                      <div key={i} className="flex items-start gap-2 mb-1">
-                        <BookOpen className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        <span>
-                          {cite.authors}, {cite.year}: {cite.text.slice(0,100)}...
-                        </span>
-                      </div>
-                    ))}
+                  <div className="mt-3 p-4 bg-slate-100 rounded-xl">
+                    <div className="flex items-center gap-2 mb-3 text-sm font-medium text-slate-700">
+                      <Info className="w-4 h-4" />
+                      {t('chat.sources')} ({msg.citations.length})
+                    </div>
+                    <div className="space-y-2">
+                      {msg.citations.map((cite, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-2 text-xs text-slate-600 bg-white p-3 rounded-lg"
+                        >
+                          <BookOpen className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <div className="font-medium text-slate-800">
+                              {cite.authors}, {cite.year}
+                            </div>
+                            <div className="text-slate-500 mt-1 line-clamp-2">
+                              {cite.text}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                {/* 时间 */}
+                <div className={`mt-2 text-xs text-slate-400 ${msg.role === 'user' ? 'text-right' : ''}`}>
+                  {new Date().toLocaleTimeString()}
+                </div>
               </div>
             </div>
           ))}
+
+          {/* 加载状态 */}
           {loading && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <Bot className="w-4 h-4 text-green-600" />
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                <Bot className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-white border border-slate-200 px-5 py-4 rounded-2xl">
                 <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                 </div>
               </div>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder={t('chat.placeholder')}
-            className="input flex-1"
-            disabled={loading}
-          />
-          <button
-            onClick={handleSend}
-            disabled={loading || !input.trim()}
-            className="btn btn-primary px-4"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+        {/* 输入区域 */}
+        <div className="bg-white border-t border-slate-200 px-6 py-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder={t('chat.placeholder')}
+                className="w-full px-5 py-4 pr-14 bg-slate-50 border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                rows={2}
+                disabled={loading}
+              />
+              <button
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                className="absolute right-3 bottom-3 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white rounded-lg transition-colors"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 mt-2 text-center">
+              {locale === 'zh'
+                ? '按 Enter 发送，Shift + Enter 换行'
+                : 'Press Enter to send, Shift + Enter for new line'}
+            </p>
+          </div>
         </div>
       </div>
     </div>
