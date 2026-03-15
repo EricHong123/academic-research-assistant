@@ -1,4 +1,7 @@
+'use client';
+
 import { I18nProvider } from '@/lib/i18n';
+import { Header } from '@/components/header';
 import SearchPage from './search-page';
 
 export default function Home({
@@ -8,7 +11,12 @@ export default function Home({
 }) {
   return (
     <I18nProvider locale={lang}>
-      <SearchPage />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <SearchPage />
+        </main>
+      </div>
     </I18nProvider>
   );
 }
