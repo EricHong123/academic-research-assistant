@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Folder, FileText, Trash2, Search, Calendar, ChevronRight, X, CheckCircle } from 'lucide-react';
+import { Plus, Folder, FileText, Trash2, Search, Calendar, ChevronRight, X, Sparkles, Brain } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 
 interface Project {
@@ -10,7 +10,6 @@ interface Project {
   description?: string;
   paper_count: number;
   created_at: string;
-  updated_at: string;
 }
 
 export default function ProjectsPage() {
@@ -74,31 +73,31 @@ export default function ProjectsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header Section */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="min-h-screen pt-16 bg-[#0a0a0f]">
+      {/* Header */}
+      <div className="relative overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 grid-bg opacity-30" />
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
+        <div className="relative max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">{t('projects.title')}</h1>
-              <p className="text-slate-500 mt-1">
-                {locale === 'zh'
-                  ? '管理您的文献收藏和研究项目'
-                  : 'Manage your literature collections and research projects'}
+              <h1 className="text-3xl font-bold text-white mb-2">{t('projects.title')}</h1>
+              <p className="text-white/40">
+                {locale === 'zh' ? '管理您的文献收藏和研究项目' : 'Manage your literature collections and projects'}
               </p>
             </div>
             <button
               onClick={() => setShowCreate(true)}
-              className="btn btn-primary"
+              className="btn-primary"
             >
               <Plus className="w-5 h-5" />
               {t('projects.new')}
             </button>
           </div>
 
-          {/* Search Box */}
+          {/* Search */}
           <div className="mt-6 max-w-md relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
             <input
               type="text"
               value={searchQuery}
@@ -110,26 +109,27 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Create Modal */}
         {showCreate && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-scale-in">
-              <div className="flex items-center justify-between p-6 border-b border-slate-100">
-                <h3 className="text-lg font-semibold text-slate-800">{t('projects.create')}</h3>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="w-full max-w-md bg-[#12121a] border border-white/10 rounded-2xl animate-fade-in">
+              <div className="flex items-center justify-between p-6 border-b border-white/5">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-indigo-400" />
+                  {t('projects.create')}
+                </h3>
                 <button
                   onClick={() => setShowCreate(false)}
-                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 text-white/40 hover:text-white hover:bg-white/5 rounded-lg transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleCreate} className="p-6">
                 <div className="mb-5">
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    {t('projects.name')} *
-                  </label>
+                  <label className="block text-sm text-white/60 mb-2">{t('projects.name')} *</label>
                   <input
                     type="text"
                     value={newProject.name}
@@ -141,29 +141,20 @@ export default function ProjectsPage() {
                   />
                 </div>
                 <div className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    {t('projects.description')}
-                  </label>
+                  <label className="block text-sm text-white/60 mb-2">{t('projects.description')}</label>
                   <textarea
                     value={newProject.description}
                     onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                     className="input resize-none"
                     rows={3}
-                    placeholder={locale === 'zh' ? '输入项目描述（可选）' : 'Enter project description (optional)'}
+                    placeholder={locale === 'zh' ? '输入项目描述（可选）' : 'Enter description (optional)'}
                   />
                 </div>
                 <div className="flex gap-3 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreate(false)}
-                    className="btn btn-secondary"
-                  >
+                  <button type="button" onClick={() => setShowCreate(false)} className="btn-secondary">
                     {t('projects.cancel')}
                   </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                  >
+                  <button type="submit" className="btn-primary">
                     {t('projects.createBtn')}
                   </button>
                 </div>
@@ -172,83 +163,68 @@ export default function ProjectsPage() {
           </div>
         )}
 
-        {/* Loading State */}
+        {/* Loading */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-slate-500">{t('common.loading')}</p>
+            <div className="w-10 h-10 border-2 border-white/10 border-t-indigo-500 rounded-full animate-spin mb-4" />
+            <p className="text-white/40">{t('common.loading')}</p>
           </div>
         ) : filteredProjects.length === 0 ? (
-          /* Empty State */
-          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Folder className="w-10 h-10 text-blue-300" />
+          /* Empty */
+          <div className="text-center py-20">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
+              <Folder className="w-10 h-10 text-indigo-400/50" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">
-              {searchQuery
-                ? (locale === 'zh' ? '未找到匹配项目' : 'No matching projects')
-                : t('projects.empty')}
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {searchQuery ? (locale === 'zh' ? '未找到匹配项目' : 'No matching projects') : t('projects.empty')}
             </h3>
-            <p className="text-slate-500 mb-6 max-w-sm mx-auto">
-              {locale === 'zh'
-                ? '创建一个新项目开始管理您的文献收藏'
-                : 'Create a new project to start managing your literature collection'}
+            <p className="text-white/40 mb-6">
+              {locale === 'zh' ? '创建一个新项目开始管理您的文献' : 'Create a new project to start managing your literature'}
             </p>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="btn btn-primary inline-flex"
-            >
+            <button onClick={() => setShowCreate(true)} className="btn-primary inline-flex">
               <Plus className="w-5 h-5" />
               {locale === 'zh' ? '创建项目' : 'Create Project'}
             </button>
           </div>
         ) : (
-          /* Projects Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          /* Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProjects.map((project, index) => (
               <div
                 key={project.id}
-                className="card card-hover group cursor-pointer stagger-item"
+                className="glass-card group p-5 cursor-pointer animate-slide-up"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-                      <Folder className="w-6 h-6 text-white" />
-                    </div>
-                    <button
-                      onClick={(e) => handleDelete(project.id, e)}
-                      className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                      title={locale === 'zh' ? '删除项目' : 'Delete project'}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
+                    <Folder className="w-6 h-6 text-white" />
                   </div>
-
-                  <h3 className="font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
-                    {project.name}
-                  </h3>
-                  {project.description && (
-                    <p className="text-sm text-slate-500 mb-4 line-clamp-2">{project.description}</p>
-                  )}
-
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
-                      <FileText className="w-4 h-4" />
-                      <span>{project.paper_count} {t('projects.papers')}</span>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
-                  </div>
+                  <button
+                    onClick={(e) => handleDelete(project.id, e)}
+                    className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="px-5 py-3 bg-slate-50 rounded-b-2xl border-t border-slate-100 flex items-center gap-2 text-xs text-slate-400">
+                <h3 className="font-semibold text-white mb-2 group-hover:text-indigo-400 transition-colors">
+                  {project.name}
+                </h3>
+                {project.description && (
+                  <p className="text-sm text-white/40 mb-4 line-clamp-2">{project.description}</p>
+                )}
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                  <div className="flex items-center gap-2 text-sm text-white/40">
+                    <FileText className="w-4 h-4" />
+                    <span>{project.paper_count} {t('projects.papers')}</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-indigo-400 transition-colors" />
+                </div>
+
+                <div className="mt-3 flex items-center gap-2 text-xs text-white/30">
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>
-                    {new Date(project.created_at).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </span>
+                  {new Date(project.created_at).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US')}
                 </div>
               </div>
             ))}
